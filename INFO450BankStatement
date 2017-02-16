@@ -1,0 +1,132 @@
+// newinfo450bankstatement.cpp : Defines the entry point for the console application.
+//
+
+#include <iostream>
+#include "stdafx.h"
+
+using namespace std;
+
+//function prototypes
+int Deposit(int amount, int curBalance);
+int Withdrawal(int amount, int curBalance);
+int check(int amount, int curBalance);
+float WithdrawArray[20];
+float DepositArray[20];
+float CheckArray[20];
+int numWithdraw = 0;
+int numDeposit = 0;
+int numCheck = 0;
+int tw = 0;
+int td = 0;
+int tc = 0;
+int i;
+
+
+int main()
+{
+
+	//Variables
+	int BegBalance;
+	int amount = 0;
+	char answer;
+	bool notDone = true;
+
+	cout << "\n""     Please enter in your beginning balance below." << endl;
+	cin >> BegBalance;
+	int curBalance = BegBalance;
+	cout << "     Enter Transactions:" << endl;
+	cout << "     ____________________" << endl;
+
+	while (notDone) {
+
+		cout << "     To make a transaction please enter in the corresponding letter to the type of transaction:""\n";
+		cout << "     (W)Withdraw, (D)Deposit, (C)Checks, (Q)quit.""\n";
+		cin >> answer;
+
+		switch (answer)
+		{
+		case 'D':
+		case 'd':
+			cout << "     How much do you want to deposit? " << endl;
+			cin >> amount;
+			curBalance = Deposit(amount, curBalance);
+			td += amount;
+			DepositArray[numDeposit] = amount;
+			numDeposit++;
+			break;
+		case 'W':
+		case 'w':
+			cout << "     How much do you want to withdraw? " << endl;
+			cin >> amount;
+			if (amount > curBalance) {
+				cout << "     You cannot overdraw your account. Try again.\n";
+				break;
+			}//end account check
+			else {
+				curBalance = Withdrawal(amount, curBalance);
+				tw += amount;
+				WithdrawArray[numWithdraw] = amount;
+				numWithdraw++;
+				break;
+			}
+		case 'C':
+		case 'c':
+			cout << "     How much is your check?" << endl;
+			cin >> amount;
+			curBalance = check(amount, curBalance);
+			tc += amount;
+			CheckArray[numCheck] = amount;
+			numCheck++;
+			break;
+		case 'Q':
+		case 'q':
+			notDone = false;
+			break;
+		default:
+			cout << "      Not Valid input, try again.";
+			break;
+		}//end switch
+	}//end main while loop	
+
+	cout << "\n\n     This is your Beginning Balance:" << BegBalance << endl;
+	cout << "\n     _______________________________";
+	cout << "\n     Here are the withdrawals you entered:";
+	for (i = 0; i < numWithdraw; i++)
+		cout << "\n     " << WithdrawArray[i];
+	cout << "\n     _______________________________";
+	cout << "\n     This is your total withdrawals:" << tw << endl;
+	cout << "     _______________________________";
+	cout << "\n     Here are the Deposits you entered:";
+	for (i = 0; i < numDeposit; i++)
+		cout << "\n     " << DepositArray[i];
+	cout << "\n     _______________________________";
+	cout << "\n     This is your total Deposits:" << td << endl;
+	cout << "     _______________________________";
+	cout << "\n     Here are the Checks you entered:";
+	for (i = 0; i < numCheck; i++)
+		cout << "\n     " << CheckArray[i];
+	cout << "\n     This is your total Checks:" << tc << endl;
+	cout << "     _______________________________";
+	cout << "\n     This is your current Balance:     " << curBalance << endl;
+	cout << "\n     Thank you and have a nice day!\n \n \n";
+	system("pause");
+	return 0;
+}//end main
+
+int Deposit(int amount, int curBalance)
+{
+	curBalance += amount;
+	return curBalance;
+}//end deposit
+
+int Withdrawal(int amount, int curBalance)
+{
+	curBalance -= amount;
+	return curBalance;
+}//end withdrawal
+
+int check(int amount, int curBalance)
+{
+	curBalance -= amount;
+	return curBalance;
+}//end check
