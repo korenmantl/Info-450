@@ -1,0 +1,142 @@
+// Timothy_Korenman_info450Ticket.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <string>
+#include <stdio.h>
+
+using namespace std;
+
+class Ticket
+{
+private:
+	string issueStatus;
+	char issueType;
+	char issuePriority[25];
+	char callerName[100];
+	char description[1000];
+	int numberUsers;
+	int id;
+	static int id_counter;
+public:
+	Ticket();
+	void ShowTicket();
+	void CaptureTicket();
+	void CloseTicket();
+};
+
+int Ticket::id_counter = 1; //must be initialized outside class
+
+Ticket::Ticket()
+{
+	id = id_counter++;
+	issueStatus = "Open!";
+}
+
+void Ticket::CloseTicket()
+{
+	issueStatus = "Closed";
+	cout << "\tTicket number " << id << " is " << issueStatus << endl << "\n\n";
+}
+
+void Ticket::ShowTicket()
+{
+	cout << "\t Issue id: " << id;
+	switch (issueType)
+	{
+	case 'S':
+	case 's':
+		cout << "\t    Type: Server    \n";
+		break;
+	case 'A':
+	case 'a':
+		cout << "\t    Type: Application \n";
+		break;
+	case 'C':
+	case 'c':
+		cout << "\t    Type: Access \n";
+		break;
+	default:
+		cout << "\tNot Valid Input. Try Again.";
+		break;
+	}
+	cout << "\t Description: " << description << endl;
+	cout << "\t User: " << callerName << endl;
+	cout << "\t Users Impacted:" << numberUsers << endl;
+	if (numberUsers < 10)
+		cout << "\tPriority: LOW \n";
+	if (numberUsers >= 10 && numberUsers < 50)
+	{
+		cout << "\tPriority: MEDIUM \n";
+	}
+	if (numberUsers > 50)
+	{
+		cout << "\tPriority: HIGH \n";
+	}
+	cout << "\t- - - - - - - - - - - - - - - -" << endl;
+}
+
+void Ticket::CaptureTicket()
+{
+	//unsigned int Ticket::id_counter = 0; //must be initialized outside class
+	cin.clear();
+	cin.ignore();
+	cout << "\n\tWhat is the name of the caller?" << endl << "\t";
+	gets_s(callerName);
+	cout << "\n\tIssue Type? S=Server, A=Application, C=aCcess" << endl << "\t";
+	cin >> issueType;
+	cin.ignore();
+	cout << "\n\tDescription of issue?" << endl << "\t";
+	gets_s(description);
+	cout << "\n\tHow many users impacted?" << endl << "\t";
+	cin >> numberUsers;
+	cin.clear();
+	cin.ignore();
+	cout << "\n\tYour issue id  is " << id << endl;
+	cout << "\t- - - - - - - - - - - - - - - - - - - -" << endl << "\n";
+}
+
+int main()
+{
+	const int maxTickets = 100;
+	bool newticket = true;
+	char choice;
+	Ticket myTicket[maxTickets];
+	int numTickets = 0;
+	bool notDone = true;
+		cout << "\n\t\t\t\t - - - - - - - - - - - - - - - - - - - - - - - - -" << endl;
+		cout << "\t\t\t\t|          Welcome to TICKET Submission tool      |" << endl;
+		cout << "\t\t\t\t - - - - - - - - - - - - - - - - - - - - - - - - -\n \n" << endl;
+		while (notDone)
+	{
+
+		cout << "\tWould you like to enter in a new ticket? \n\tPress Y to continue. Press N to cancel." << endl << "\t";
+		cin >> choice;
+		switch (choice)
+		{
+		case 'Y':
+		case 'y':
+				myTicket[numTickets].CaptureTicket();
+				numTickets++;
+			break;
+		case 'N':
+		case 'n':
+			notDone = false;
+			break;
+		default:
+			cout << "\tI'm sorry try again" << endl
+				;
+			break;
+		}
+	}
+	cout << "\t - - - - - - - - - - - - - - - -" << endl;
+	cout << "\t|          TICKET LISTING       |" << endl;
+	cout << "\t - - - - - - - - - - - - - - - -\n \n" << endl;
+	for (int i = 0; i < numTickets; ++i)
+	{
+		myTicket[i].ShowTicket();
+	}
+	myTicket[0].CloseTicket();
+	return 0;
+}
