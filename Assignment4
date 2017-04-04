@@ -1,0 +1,37 @@
+Private Sub SubmitForm_Initialize()
+
+'empty FullNametextbox
+FullNameBox.Value = ""
+
+'empty Usernametextbox
+Username.Value = ""
+
+'Set other as default
+OptionButtion.Value = True
+
+'empty graduationbox
+Graduation.Value = ""
+
+'empty phonenumber
+PhoneNumber.Value = ""
+
+ComboBox.Clear
+
+'fill Major
+With MajorComboBox
+.AddItem "Financial Technologies"
+.AddItem "Marketing"
+.AddItem "Accounting"
+.AddItem "Economics"
+.AddItem "Information Systems"
+.AddItem "Real Estate"
+.AddItem "Human Resources"
+.AddItem "Management"
+.AddItem "Supply Chain Mgmt"
+.AddItem "Faculty"
+.AddItem "Other"
+End With
+'set focus to fullname box
+FullName.SetFocus
+
+End Sub
