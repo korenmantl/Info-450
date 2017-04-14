@@ -1,0 +1,328 @@
+// INFO450FavoriteThing.cpp
+//Video Games favorite thing....
+//Produced by Tim Korenman
+
+
+#include "stdafx.h"
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <windows.h>
+#include <conio.h>
+#include <list>
+
+using namespace std;
+
+const int READERROR = 150;
+const int WRITEERROR = 300;
+const int ARRAYSIZE = 150;
+
+
+class Game
+{
+	string g_Name;
+	string gameplay_type;
+	int rating;
+	string gameDeveloper;
+	string gameDescription;
+	string hoursofPlay;
+	string characterName;
+
+
+public:
+	Game();
+	Game(string name, string type, int rate, string developer, string description, string hours, string character);
+	void capNewGame();
+	void showGame();
+	int saveGame(ofstream& outfile);
+	bool sameGame(Game* name);
+	friend class GameList;
+};
+
+
+class GameList
+{
+protected:
+	Game** list;
+	int numrecords;
+	int lSize;
+	int reallocateArray();
+
+public:
+	GameList();
+	~GameList();
+	void getInput();
+	void showList();
+	int s_List(string filename);
+	int r_List(string filename);
+	void addGame();
+};
+
+
+Game::Game()
+{
+	g_Name = "";
+	characterName = "";
+	gameplay_type = "";
+	gameDescription = "";
+	hoursofPlay = "";
+	rating;
+	gameDeveloper = "";	
+}
+
+
+Game::Game(string name, string type, int rate, string developer, string description, string hours, string character)
+{
+	g_Name = name;
+	characterName = character;
+	gameplay_type = type;
+	gameDescription = description;
+	hoursofPlay = hours;
+	rating = rate;
+	gameDeveloper = developer;
+}
+
+
+//Compare unique Id for Game
+bool Game::sameGame(Game* name)
+{
+	if (g_Name == name->g_Name && gameDeveloper == name->gameDeveloper)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+//Capture Game from end users
+void Game::capNewGame()
+{
+	cout << "Game Name:    ";
+	getline(cin, g_Name);
+	cout << "Gameplay type:    ";
+	getline(cin, gameplay_type);
+	cout << "Main Character Name:    ";
+	getline(cin, characterName);
+	cout << "Game Description:    ";
+	getline(cin, gameDescription);
+	cout << "Game Developer:    ";
+	getline(cin, gameDeveloper);
+	cout << "Number of hours played (or planning to play):   ";
+	getline(cin, hoursofPlay);
+	cout << "Personal Game Rating (1-10):    ";
+	cin >> rating;
+	cin.ignore();
+	cin.clear();
+}
+
+//Display Game to console
+void Game::showGame()
+{
+	cout << "\n\t\t\t__________________________________\n"<< endl;
+	cout << "\t\t Game Name: " << g_Name << endl;
+	cout << "\t\t Gameplay type: " << gameplay_type << endl;
+	cout << "\t\t Main Character Name: " << characterName << endl;
+	cout << "\t\t Game Description: " << gameDescription << endl;
+	cout << "\t\t Game Developer: " << gameDeveloper << endl;
+	cout << "\t\t Number of hours played (or planning to play): " << hoursofPlay << endl;
+	cout << "\t\t\t Personal Game Rating: " << rating << endl;
+}
+
+
+//Save game
+int Game::saveGame(ofstream& outfile)
+{
+	showGame();
+	string ans;
+	cout << "Add game to list? Yes or No?" << endl;
+	cin >> ans;
+	cout << "\n" << endl;
+	if	(outfile.is_open() && (ans == "Yes" || ans == "yes"))
+	{
+		outfile << g_Name << "|" << gameplay_type << "|" << characterName << "|" << gameDescription << "|" << gameDeveloper << "|" << hoursofPlay << 
+			"|" << rating << endl;
+		return 0;
+	}
+	else
+		return WRITEERROR;
+}
+
+// game constructor
+GameList::GameList()
+{
+	list = new Game*[ARRAYSIZE];
+	numrecords = 0;
+	lSize = ARRAYSIZE;
+}
+
+
+//Deconstructor - free allocated memeory
+GameList::~GameList()
+{
+	for (int i = 0; i < numrecords; i++)
+	{
+		delete list[i];
+	}
+	delete[]list;
+}
+
+
+//Reallocate memory if already at capacity
+int GameList::reallocateArray()
+{
+	Game** temp;
+	temp = new Game*[lSize + ARRAYSIZE];
+	lSize = lSize + ARRAYSIZE;
+	for (int i = 0; i < numrecords; i++)
+	{
+		temp[i] = list[i];
+	}
+	delete[]list;
+	list = temp;
+	return 0;
+}
+
+//add new game to list if not current in list
+void GameList::addGame()
+{
+	Game* myGame;
+	myGame = new Game();
+	bool found = false;
+
+	myGame->capNewGame();
+
+	for (int i = 0; i < numrecords; i++)
+	{
+		if (list[i]->sameGame(myGame))
+
+		{
+			cout << "\nDuplicate game found! Please enter another game..." << endl;
+			found = true;
+		}
+	}
+	if (found == false)
+	{
+		list[numrecords] = myGame;
+		numrecords++;
+	}
+}
+
+
+//Get User Input
+void GameList::getInput()
+{
+	string answer = "Y";
+	cout << "\nEnter Game? Yes or No" << endl;
+	getline(cin, answer);
+	while (answer == "Yes" || answer == "yes")
+	{
+		Game* myGame = new Game();
+		addGame();
+		cout << "\nEnter another Game? Yes or No" << endl;
+		getline(cin, answer);
+	}
+}
+
+//Show game list to console
+void GameList::showList()
+{
+	for (int i = 0; i < numrecords; i++)
+	{
+		list[i]->showGame();
+	}
+}
+
+
+//Save list to file
+int GameList::s_List(string filename)
+{
+	ofstream output(filename, ios::trunc);
+	if (output)
+	{
+		for (int i = 0; i < numrecords; i++)
+		{
+			list[i]->saveGame(output);
+		}
+		output.close();
+	}
+	else
+	{
+		return WRITEERROR;
+	}
+
+	return 0;
+}
+
+//Read game list from a file
+int GameList::r_List(string filename)
+{
+	string iname, itype, idesc, icharname, ihours, idev, irate;
+	int count = 0;
+	ifstream infile(filename, ios::in);
+	if (!infile)
+	{
+		cout << "ERROR: File could not be opened" << endl;
+		return READERROR;
+	}
+	while (!infile.eof())
+	{
+		if (numrecords == lSize)
+		{
+			reallocateArray();
+		}
+		getline(infile, iname, '|');
+		if (!iname.empty())
+		{
+			getline(infile, iname, '|');
+			getline(infile, itype, '|');
+			getline(infile, idesc, '|');
+			getline(infile, icharname, '|');
+			getline(infile, ihours, '|');
+			getline(infile, idev, '|');
+			getline(infile, irate);
+			int rate = stoi(irate);
+			list[numrecords] = new Game(iname, itype, rate, ihours, idesc, icharname, idev);
+			numrecords++;
+		}
+	}
+	infile.close();
+	return 0;
+}
+
+
+int main()
+{
+	GameList my;
+
+	int error;
+	string answer;
+	string filename;
+
+	cout << "\t\t\t________________________________________________________________" << endl;
+	cout << "\t\tWelcome to The Game Collection Tracker!" << endl;
+	cout << "\t\tTo access the list text file. Use the file path where the text file" << endl;
+	cout << "\t\tis stored on your machine. Ex. C:\\Projects\\gameList.txt" << endl;
+
+	cout << "\t\tEnter the full path of the file: " << endl;
+	getline(cin, filename);
+	ifstream file(filename);
+	error = my.r_List(filename);
+	if (error)
+	{
+		cout << "\t\t\t________________________________________________________________" << endl;
+		cout << "\t\tCannot read list" << endl;
+		cout << "\t\tPossible issues:" << endl;
+		cout << "\t\t1. Incorrect file name" << endl;
+		cout << "\t\t2. File does not exist " << endl;
+		cout << "\t\t3. Incorrect file path" << endl;
+
+		return 0;
+	}
+
+	my.getInput();
+	my.s_List(filename);
+	my.showList();
+	return 0;
+}
